@@ -1,10 +1,9 @@
-from twisted.internet import reactor, error
-
+from __future__ import absolute_import
+import client
 import sctPT.network.launch_transport as launch_transport
 import sctPT.transports.transports as transports
 import sctPT.common.log as logging
 import sctPT.common.transport_config as transport_config
-
 from pyptlib.client import ClientTransportPlugin
 from pyptlib.config import EnvError
 
@@ -30,7 +29,7 @@ def do_managed_client():
         #or
         ptclient.init(["SCTP", "Dummy"])
         #^ arg is the list of names of transports supported
-    except EnvError, err:
+    except EnvError as err:
         #listens for error from pyptlib
         log.warning("Client managed proxy protocol failed (%s)." % err)
         return
@@ -74,7 +73,7 @@ def do_managed_client():
             log.warning("Could not find transport '%s'" % transport)
             ptclient.reportMethodError(transport, "Could not find transport.")
             continue
-        except error.CannotListenError, e:
+        except error.CannotListenError as e:
             error_msg = "Could not set up listener (%s:%s) for '%s' (%s)." % \
                         (e.interface, e.port, transport, e.socketError[1])
             log.warning(error_msg)
@@ -97,4 +96,12 @@ def do_managed_client():
     ptclient.ReportMethodsEnd()
     #tells pyptlib everything is finished, wihch then tells tor to start pushing traffic
 
+    if should_start_event_loop:
+        log.info("Starting up the event loop.")
+        loop = client.get_running_loop()
+        loop.run_forever()
+    else:
+        log.info("No transports launched. Nothing to do.")
 
+    if not loop.is_running():
+        log.info("Event loop not started correctly")

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import sctPT.transports.dummy as dummy
 import sctPT.transports.b64 as b64
 import sctPT.transports.sctPT as sctPT

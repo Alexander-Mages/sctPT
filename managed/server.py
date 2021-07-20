@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from twisted.internet import reactor, error
 
 from pyptlib.server import ServerTransportPlugin
@@ -27,7 +28,7 @@ def do_managed_server():
         ptserver.init(["SCTP", "Dummy"])
         #ptserver.init(transports.transports.keys())
         #leaving here for searching purposes, second implementation is in obfsproxy
-    except EnvError, err:
+    except EnvError as err:
         log.warning("server managed proxy protocol failed (%s)." % err)
         return
 
@@ -87,7 +88,7 @@ def do_managed_server():
             log.warning("Could not find transport '%s'" % transport)
             ptserver.reportMethodError(transport, "Could not find transport.")
             continue
-        except error.CannotListenError, e:
+        except error.CannotListenError as e:
             error_msg = "Could not set up listener (%s:%s) for '%s' (%s)." % \
                         (e.interface, e.port, transport, e.socketError[1])
             log.warning(error_msg)
@@ -113,7 +114,7 @@ def do_managed_server():
 
         #if the transport filtered its options:
         if public_options_dict:
-            optlist []
+            optlist = []
             for k, v in public_options_dict.items():
                 optlist.append("%s=%s" % (k,v))
             public_options_str = ",".join(optlist)
