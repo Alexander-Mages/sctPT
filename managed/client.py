@@ -9,99 +9,67 @@ from pyptlib.config import EnvError
 
 import pprint
 
-log = logging.get_obfslogger
+#add logger support, take obfsproxy example
+log = logging.get_logger
 
-def do_managed_client():
-    #start managed-proxy protocol as client
+def managed_client(addr, socksVersion, socksPort):
+    client = pyptlib.client
+    should_start_threading = False
 
-    should_start_event_loop = False
-    #not sure what this does^ adding to prevent errors
-
-
+    sctpaddrport = (addr)
+    socksaddrport = (("localhost", socksPort))
+    socksversion = socksVersion
 #
 #GET TRANSPORT INFO FROM TOR
 #
-
-
-    ptclient = ClientTransportPlugin
     try:
-        #ptclient.init(transports.transports.keys())
-        #or
-        ptclient.init(["SCTP", "Dummy"])
-        #^ arg is the list of names of transports supported
+        config_info = client.init(["sctPT"])
     except EnvError as err:
-        #listens for error from pyptlib
-        log.warning("Client managed proxy protocol failed (%s)." % err)
+        log.warning("pyptlib could not bootstrap (%s)." % err)
         return
-    #^ part of pyptlib, gets transport information from tor
-
-    log.debug("pyptlib gave us the following data:\n'%s'", pprint.pformat(ptclient.getDebugData()))
-    #added verbosity, dont see a reason to not use
-
-
+    log.debug("data from pyptlib:\n'%s'", pprint.pformat(client.getDebugData()))
 #
 #CONFIGURE TRANSPORTS
 #
-
-
-##TAKE A SECOND LOOK AT THIS
-    for transport in ptclient.GetTransports():
-
-        pt_config = transport_config.TransportConfig()
-        pt_config.setStateLocation(ptclient.config.getStateLocation())
-        pt_config.setListenerMode("socks")
-        pt_config.setObfsproxyMode("managed")
-        #all 4 functions defined in transport_config.py
-    #^configures managed mode parameters, state location and transports list is passed from init()
-
-        transport_class = transports.get_transport_class(transport, 'socks')
-    #^Defined in transports.py, used in server.py, client.py, and launch_transport.py
-        transport_class.setup(pt_config)
-    #check this^
-
-#
-#LAUNCH TRANSPORTS
-#
-
-
+    #figure out where to put state location, it is provided inside of info
+    if 'sctPT' in config_info['transports']:
         try:
-            addrport = launch_transport.launch_transport_listener(transport, None, 'socks', None, pt_config)
-            #^defined in launch_transport.py
-            #launches transport with parameters and current transport
-            #not sure how it decides on one transport yet
-        except transports.TransportNotFound:
-            log.warning("Could not find transport '%s'" % transport)
-            ptclient.reportMethodError(transport, "Could not find transport.")
-            continue
+            #you might want to pass the config stuff, revisit.
+            transport = network.ClientNetwork
+            try:
+                transport.launchTransport(socksaddrport, sctpaddrport, socksversion)
+            except error.ProxyError as e:
+                error_msg = "Socks Version not supported, attempting to launch transport using other rev. (5/4)"
+                log.warning(error_msg)
+                try:
+                    if socksversion == 5:
+                        transport.launchTransport(socksaddrport, sctpaddrport, 4)
+                    elif socksversion == 4:
+                        transport.launchTransport(socksaddrport, sctpaddrport, 5)
+                except error.ProxyError as e:
+                    error_msg = "PySocks Error: (%s:%s) for sctPT (%s)" % \
+                                (e.interface, e.port, e.socketError[1])
+                    log.warning(error_msg)
+                    client.reportFailure('sctPT', error_msg)
         except error.CannotListenError as e:
-            error_msg = "Could not set up listener (%s:%s) for '%s' (%s)." % \
-                        (e.interface, e.port, transport, e.socketError[1])
+            error_msg = "Couldnt start sockets (%s:%s) for sctPT (%s)." % \
+                            (e.interface, e.port, e.socketError[1])
             log.warning(error_msg)
-            ptclient.reportMethodError(transport, error_msg)
-            continue
-            #reports errors to pyptlib
-
-
+            client.reportFailure('sctPT', error_msg)
 #
 #REPORT SUCCESS TO PYPTLIB AND TOR
 #
-
-
-        #still have no idea what this is, adding it to prevent errors
-        should_start_event_loop = True
-        log.debug("Successfully launched '%s' at '%s'" % (transport, log.safe_addr_str(str(addrport))))
-        ptclient.reportMethodSuccess(transport, "socks5", addrport, None, None)
-        #report success to log and pyptlib
-
-    ptclient.ReportMethodsEnd()
+    should_start_threading = True
+    log.debug("Successfully launched sctPT. Socks listening at: '%s'" % (log.safe_addr_str(str(addrport))))
+    log.debug("SCTP listening at: '%'" % (socksaddrport))
+    client.reportSuccess('sctPT', socksversion, (socksaddrport), None, None)
+    client.ReportEnd()
     #tells pyptlib everything is finished, wihch then tells tor to start pushing traffic
 
-    if should_start_event_loop:
-        log.info("Starting up the event loop.")
-        loop = client.get_running_loop()
-        loop.run_forever()
+    if should_start_threading:
+        #args might be suitable to have here
+        isActiveBool = transport.startProxying()
+        if isActiveBool:
+            log.info("Data proxying correctly")
     else:
-        log.info("No transports launched. Nothing to do.")
-
-    if not loop.is_running():
-        log.info("Event loop not started correctly")
+        log.info("No transports launched.")

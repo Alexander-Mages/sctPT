@@ -6,13 +6,14 @@ import sctPT.network.extended_orport as extended_orport
 
 from twisted.internet import reactor
 
-def launch_transport_listener(transport, bindaddr, role, remote_addrport, pt_config, ext_or_cookie_file=None):
+def launch_transport_listener(#transport
+         bindaddr, role, remote_addrport, pt_config, ext_or_cookie_file=None):
 
      transport_class = transports.get_transport_class(transport, role)
      listen_host = bindaddr[0] if bindaddr else 'localhost'
      listen_port = int(bindaddr[1]) if bindaddr else 0
 
-     if role == 'socks':
+     if role == 'client':
          factory = socks.OBFSSOCKSv5Factory(transport_class, pt_config)
      elif role == 'ext_server':
          assert(remote_addrport and ext_or_cookie_file)
@@ -23,4 +24,6 @@ def launch_transport_listener(transport, bindaddr, role, remote_addrport, pt_con
 
      addrport = reactor.listenTCP(listen_port, factory, interface=listen_host)
 
-     return (addrport.getHost().host, addrport.getHost().port)
+     #SOCKSVERSION = 4
+     SOCKSVERSION = 5
+     return (addrport.getHost().host, addrport.getHost().port), SOCKSVERSION
