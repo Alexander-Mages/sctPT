@@ -1,7 +1,7 @@
 import time
 import socket
 import socks
-import threading
+from threading import Thread
 import transport.clientTransport
 #threading but with better performance, allows multiple cores to be used, syntax is a little odder, but performance is important
 from multiprocessing import Process
@@ -29,14 +29,17 @@ class ClientNetwork():
         sctpsock.listen(25)
         print("socket bound and socket listening")
 
+        #BUG
+        #sctp must connect first, im not sure exactly how to do this better.
+        #maybe threads?
         print("accepting connections on both sockets")
-        sctpsocket, address = sctpsock.accept()
-        print("sctp connection accepted from bridge at", address)
-        sockssocket, address = sockssock.accept()
+        self.sockssocket, address = sockssock.accept()
         print("socks connection accepted from tor browser at", address)
+        self.sctpsocket, address = sctpsock.accept()
+        print("sctp connection accepted from bridge at", address)
 
-        self.sctpsocket = sctpsocket
-        self.sockssocket = sctpsocket
+        # self.sctpsocket = sctpsocket
+        # self.sockssocket = sctpsocket
 
         # CHANGE NAME OF SOCKSSOCKET, IT IS WAY TOO SIMIMLAR TO SOCKSOCKET
         # no idea whether to use multiprocessing, threading, concurrency, or asyncrynosity
@@ -51,14 +54,14 @@ class ClientNetwork():
 
         clienttransport = transport.clientTransport.clientTransport()
 
-        upstreamTransport = Process(target=clienttransport.proxyUpstream, args=(self.sctpsocket, self.sockssocket))
-        downstreamTransport = Process(target=clienttransport.proxyDownstream, args=(self.sockssocket, self.sctpsocket))
+        upstreamTransport = Thread(target=clienttransport.proxyUpstream, args=(self.sctpsocket, self.sockssocket))
+        downstreamTransport = Thread(target=clienttransport.proxyDownstream, args=(self.sockssocket, self.sctpsocket))
 
         downstreamTransport.start()
         upstreamTransport.start()
 
-        downstreamTransport.join()
-        upstreamTransport.join()
+        # downstreamTransport.join()4
+        # upstreamTransport.join()
 
         self.runningProcesses.append(downstreamTransport)
         self.runningProcesses.append(upstreamTransport)

@@ -1,5 +1,5 @@
 
-import transport.ClientDataTransform
+from transport.ClientDataTransform import DataTransform
 class clientTransport:
 #initializing object: clienttransport = ClientNetwork()
 #when this is completed, __init__() is run. Beyond that, you have to call the methods in the class
@@ -8,11 +8,13 @@ class clientTransport:
 #source is sctp traffic from bridge, destination is socks/tor browser
     def proxyUpstream(self, source, dest):
         while True:
+            #numbers larger than 4096 work
             data = source.recv(4096)
             if data == '':
                 break
-            finaldata = transport.ClientDataTransform.unobfuscateData(data)
-            dest.sendall(data)
+            datatransform = DataTransform()
+            finaldata = datatransform.unobfuscateData(data)
+            dest.sendall(finaldata)
 
             #spawn concurrent threads
 
@@ -24,5 +26,6 @@ class clientTransport:
             data = source.recv(4096)
             if data == '':
                 break
-            finaldata = transport.ClientDataTransform.obfuscateData(data)
-            dest.sendall(data)
+            datatransform = DataTransform()
+            finaldata = datatransform.obfuscateData(data)
+            dest.sendall(finaldata)
