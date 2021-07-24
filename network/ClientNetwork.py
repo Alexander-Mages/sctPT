@@ -2,16 +2,15 @@ import time
 import socket
 import socks
 import threading
+import transport.clientTransport
 #threading but with better performance, allows multiple cores to be used, syntax is a little odder, but performance is important
 from multiprocessing import Process
 
 class ClientNetwork():
 
     def launchTransport(self, socksaddrport, sctpaddrport, socksVersion):
-        transport = transport.clientProxy.py
         print("launching socks proxy to communicate with the tor browser...")
         sockssock = socks.socksocket()
-
         #socksVersion = "SOCKS5"  # this will need to be defined somewhere else, i.e. pyptlib
 
         if socksVersion == 5:
@@ -36,6 +35,9 @@ class ClientNetwork():
         sockssocket, address = sockssock.accept()
         print("socks connection accepted from tor browser at", address)
 
+        self.sctpsocket = sctpsocket
+        self.sockssocket = sctpsocket
+
         # CHANGE NAME OF SOCKSSOCKET, IT IS WAY TOO SIMIMLAR TO SOCKSOCKET
         # no idea whether to use multiprocessing, threading, concurrency, or asyncrynosity
 
@@ -45,10 +47,12 @@ class ClientNetwork():
         #final method, does not terminate until program is completed
         print("Starting Processes for sockets")
 
-        runningThreads = []
+        self.runningProcesses = []
 
-        upstreamTransport = threading.Process(target=transport.proxyUpstream, args=(sctpsocket, sockssocket))
-        downstreamTransport = threading.Process(target=transport.proxyDownstream, args=(sockssocket, sctpsocket))
+        clienttransport = transport.clientTransport.clientTransport()
+
+        upstreamTransport = Process(target=clienttransport.proxyUpstream, args=(self.sctpsocket, self.sockssocket))
+        downstreamTransport = Process(target=clienttransport.proxyDownstream, args=(self.sockssocket, self.sctpsocket))
 
         downstreamTransport.start()
         upstreamTransport.start()
@@ -56,8 +60,16 @@ class ClientNetwork():
         downstreamTransport.join()
         upstreamTransport.join()
 
-        runningThreads.append(downstreamTransport)
-        runningThreads.append(upstreamTransport)
+        self.runningProcesses.append(downstreamTransport)
+        self.runningProcesses.append(upstreamTransport)
 
-        return transport.clientProxy.isRunning()
+        return self.isRunning()
 
+
+    def isRunning(self):
+        for t in self.runningProcesses:
+            if t.is_alive():
+                continue
+            elif not t.is_alive():
+                return False
+        return True

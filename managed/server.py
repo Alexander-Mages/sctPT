@@ -1,13 +1,5 @@
 from __future__ import absolute_import
-from twisted.internet import reactor, error
-
-from pyptlib.server import ServerTransportPlugin
-from pyptlib.config import EnvError
-
-import sctPT.transports.transports as transports
-import sctPT.network.launch_transport as launch_transport
-import sctPT.common.log as logging
-import sctPT.common.transport_config as transport_config
+import logging
 
 import pprint
 
@@ -29,10 +21,10 @@ def do_managed_server():
         #ptserver.init(transports.transports.keys())
         #leaving here for searching purposes, second implementation is in obfsproxy
     except EnvError as err:
-        log.warning("server managed proxy protocol failed (%s)." % err)
+        logging.warning("server managed proxy protocol failed (%s)." % err)
         return
 
-    log.debug ("pyptlib gave us the following data:\n'%s'", pprint.pformat(ptserver.getDebugData()))
+    logging.debug ("pyptlib gave us the following data:\n'%s'", pprint.pformat(ptserver.getDebugData()))
 
 
 #
@@ -85,13 +77,13 @@ def do_managed_server():
                                                                       orport,
                                                                       pt_config)
         except transports.TransportNotFound:
-            log.warning("Could not find transport '%s'" % transport)
+            logging.warning("Could not find transport '%s'" % transport)
             ptserver.reportMethodError(transport, "Could not find transport.")
             continue
         except error.CannotListenError as e:
             error_msg = "Could not set up listener (%s:%s) for '%s' (%s)." % \
                         (e.interface, e.port, transport, e.socketError[1])
-            log.warning(error_msg)
+            logging.warning(error_msg)
             ptserver.reportMethodError(transport, error_msg)
             continue
         #report errors to pyptlib
@@ -102,7 +94,7 @@ def do_managed_server():
         extra_log = ""
         if transport_options:
             extra_log = " (server transport options: '%s')" % str(transport_options)
-        log.debug("Successfully launched '%s' at '%s" % (transport, log.safe_addr_str(str(addrport)), extra_log))
+        logging.debug("Successfully launched '%s' at '%s" % (transport, logging.safe_addr_str(str(addrport)), extra_log))
         #print out transport options for redundancy
 
         # Invoke the transport-specific get_public_server_options()
@@ -119,7 +111,7 @@ def do_managed_server():
                 optlist.append("%s=%s" % (k,v))
             public_options_str = ",".join(optlist)
 
-            log.debug("do_managed_server: sending only public_options to tor: %s" % public_options_str)
+            logging.debug("do_managed_server: sending only public_options to tor: %s" % public_options_str)
         #^ allows filtering of options being sent to tor, this allows a specific transport to change options
 
         # report success for this particular transport
@@ -131,9 +123,9 @@ def do_managed_server():
     #report success after all transports have been launched on all addresses
 
     if should_start_event_loop:
-        log.info("starting event loop")
+        logging.info("starting event loop")
         reactor.run()
         #reactor is a function of twisted
         #it looks simmilar to answering machine but infinitely more configurable
     else:
-        log.info("No transports launched. Nothing to do")
+        logging.info("No transports launched. Nothing to do")

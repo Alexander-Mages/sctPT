@@ -1,28 +1,32 @@
 from __future__ import absolute_import
 import sys
 import argparse
-from pyptlib.config import checkClientMode
+import pyptlib_python3.pyptlib.config
+import managed.client
 
 def do_managed_mode(addr, socksVersion, socksPort):
-    if checkClientMode():
-        log.info('Entering client managed mode')
-        #below line nonorig, start everything in managed mode
-        #calls on client.py, a file with only this function defined
-        managed.client.managed_client(addr, socksVersion, socksPort)
-    else:
-        log.info('Entering server managed mode')
-        #below line nonorig, start managed mode for server
-        #calls upon server.py, same directory as client.py, file with only this function defined
-        managed_server.do_managed_server()
+    managedclient = managed.client.managedClient
+    managedclient.managed_client(addr, socksVersion, socksPort)
 
+    #commenting so it can be used without tor
+    # if pyptlib_python3.pyptlib.config.checkClientMode():
+    #     log.info('Entering client managed mode')
+    #     #below line nonorig, start everything in managed mode
+    #     #calls on client.py, a file with only this function defined
+    #     managed.client.managed_client(addr, socksVersion, socksPort)
+    # else:
+    #     log.info('Entering server managed mode')
+    #     #below line nonorig, start managed mode for server
+    #     #calls upon server.py, same directory as client.py, file with only this function defined
+    #     managed_server.do_managed_server()
 
-#gather cli arguments somehow
+#gather command line arguments
+#all paramaters have defaults, theoretically tor would never pass a parameter
 bindinterface = ''
 bindport = ''
 managedorexternalmode = ''
 socksversion = ''
 socksport = ''
-
 parser = argparse.ArgumentParser(description='SCTP Based Pluggable Transport\nnote: ensure firewall rules and network configuration are suitable for SCTP')
 parser.add_argument('--bind-interface', dest='bindinterface', action='store_const', const=bindinterface, default="0.0.0.0",
                     help='Interface for outward facing SCTP Socket to bind to, (default: `0.0.0.0`)')
