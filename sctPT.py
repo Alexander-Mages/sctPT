@@ -3,6 +3,7 @@ import sys
 import argparse
 import pyptlib_python3.pyptlib.config
 import managed.client
+import logging
 
 def do_managed_mode(addr, socksVersion, socksPort):
     managedclient = managed.client.managedClient
@@ -27,6 +28,7 @@ bindport = ''
 managedorexternalmode = ''
 socksversion = ''
 socksport = ''
+verbose = True
 parser = argparse.ArgumentParser(description='SCTP Based Pluggable Transport\nnote: ensure firewall rules and network configuration are suitable for SCTP')
 parser.add_argument('--bind-interface', dest='bindinterface', action='store_const', const=bindinterface, default="0.0.0.0",
                     help='Interface for outward facing SCTP Socket to bind to, (default: `0.0.0.0`)')
@@ -37,7 +39,9 @@ parser.add_argument('--managed-or-external', dest='managedorexternalmode', actio
 parser.add_argument('--socks-version', dest='socksversion', action='store_const', const=socksversion, default=5,
                     help='Socks version to be used, Socks5 is idea excepting certain cases (default: 5)')
 parser.add_argument('--socks-port', dest='socksport', action='store_const', const=socksport, default=9050,
-                    help='Port for socks to listen on, dependent on Tor configuration (default:9050)')
+                    help='Port for socks to listen on, dependent on Tor configuration (default: 9050)')
+parser.add_argument('--verbose', dest='verbose', action='store_true', default=True,
+                    help='Toggle logging verbosity, (default: true, change after development)')
 args = parser.parse_args()
 
 parser.print_help()
@@ -45,6 +49,18 @@ parser.print_help()
 addr = ((args.bindinterface, args.bindport))
 socksVersion = args.socksversion
 socksPort = args.socksport
+isverbose = args.verbose
+#configure logger
+if isverbose:
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+else:
+    logging.basicConfig(stream=sys.stdout, level=logging.WARN)
+#output_file_handler = logging.FileHandler("sctPT_log.log")
+# stdout_handler = logging.StreamHandler(sys.stdout)
+# logger.addHandler(stdout_handler)
+logger = logging.getLogger(__name__)
+#logger.addHandler(output_file_handler)
+
 
 if args.managedorexternalmode == "managed":
     do_managed_mode(addr, socksVersion, socksPort)

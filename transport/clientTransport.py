@@ -1,7 +1,11 @@
-
+import logging
 from transport.ClientDataTransform import DataTransform
 class clientTransport:
-#initializing object: clienttransport = ClientNetwork()
+
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+
+    #initializing object: clienttransport = ClientNetwork()
 #when this is completed, __init__() is run. Beyond that, you have to call the methods in the class
 #init should not contain any code here, but methods should be specialized
 
@@ -15,6 +19,7 @@ class clientTransport:
             datatransform = DataTransform()
             finaldata = datatransform.unobfuscateData(data)
             dest.sendall(finaldata)
+            self.logger.debug("data sent upstream")
 
             #spawn concurrent threads
 
@@ -29,3 +34,4 @@ class clientTransport:
             datatransform = DataTransform()
             finaldata = datatransform.obfuscateData(data)
             dest.sendall(finaldata)
+            self.logger.debug("data sent downstream")

@@ -3,13 +3,17 @@ import socket
 import socks
 from threading import Thread
 import transport.clientTransport
+import logging
 #threading but with better performance, allows multiple cores to be used, syntax is a little odder, but performance is important
 from multiprocessing import Process
 
 class ClientNetwork():
 
+
     def launchTransport(self, socksaddrport, sctpaddrport, socksVersion):
-        print("launching socks proxy to communicate with the tor browser...")
+        self.logger = logging.getLogger(__name__)
+
+        self.logger.debug("launching socks proxy to communicate with the tor browser...")
         sockssock = socks.socksocket()
         #socksVersion = "SOCKS5"  # this will need to be defined somewhere else, i.e. pyptlib
 
@@ -18,25 +22,25 @@ class ClientNetwork():
         elif socksVersion == 5:
             sockssock.set_proxy(socks.SOCKS4, "127.0.0.1")  # subsequent argument is port if desired
         else:
-                print("error")
+                self.logger.error("error")
             # add an exception here, might want to look into custom errors
         sockssock.bind(("127.0.0.1", 9050))  # whatever port tor uses for socks
         sockssock.listen(25)
 
-        print("launching sctp socket on port 6000...")
+        self.logger.debug("launching sctp socket on port 6000...")
         sctpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_SCTP)
         sctpsock.bind(("0.0.0.0", 6000))
         sctpsock.listen(25)
-        print("socket bound and socket listening")
+        self.logger.debug("socket bound and socket listening")
 
         #BUG
         #sctp must connect first, im not sure exactly how to do this better.
         #maybe threads?
-        print("accepting connections on both sockets")
+        self.logger.debug("accepting connections on both sockets")
         self.sockssocket, address = sockssock.accept()
-        print("socks connection accepted from tor browser at", address)
+        self.logger.debug("socks connection accepted from tor browser at" + str(address))
         self.sctpsocket, address = sctpsock.accept()
-        print("sctp connection accepted from bridge at", address)
+        self.logger.debug("sctp connection accepted from bridge at" + str(address))
 
         # self.sctpsocket = sctpsocket
         # self.sockssocket = sctpsocket
@@ -48,18 +52,18 @@ class ClientNetwork():
 
     def startProxying(self):
         #final method, does not terminate until program is completed
-        print("Starting Processes for sockets")
+        self.logger.debug("Starting Processes for sockets")
 
         self.runningProcesses = []
 
         clienttransport = transport.clientTransport.clientTransport()
-
+        clienttransport.__init__()
         upstreamTransport = Thread(target=clienttransport.proxyUpstream, args=(self.sctpsocket, self.sockssocket))
         downstreamTransport = Thread(target=clienttransport.proxyDownstream, args=(self.sockssocket, self.sctpsocket))
 
         downstreamTransport.start()
         upstreamTransport.start()
-
+        
         # downstreamTransport.join()4
         # upstreamTransport.join()
 
