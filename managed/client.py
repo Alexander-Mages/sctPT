@@ -14,7 +14,7 @@ class managedClient:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-    def managed_client(addr, socksVersion, socksPort):
+    def managed_client(self, addr, socksVersion, socksPort):
         should_start_threading = False
 
         sctpaddrport = (addr)
@@ -63,8 +63,8 @@ class managedClient:
     #REPORT SUCCESS TO PYPTLIB AND TOR
     #
         should_start_threading = True
-        logger.debug("Successfully launched sctPT. Socks listening at: " + (str(socksaddrport)))
-        logger.debug("SCTP listening at: " + str((socksaddrport)))
+        self.logger.debug("Successfully launched sctPT. Socks listening at: " + (str(socksaddrport)))
+        self.logger.debug("SCTP listening at: " + str((socksaddrport)))
         # pyptlib_python3.pyptlib.client.reportSuccess('sctPT', socksversion, (socksaddrport), None, None)
         # pyptlib_python3.pyptlib.client.ReportEnd()
         #tells pyptlib everything is finished, wihch then tells tor to start pushing traffic
@@ -73,6 +73,6 @@ class managedClient:
             #args might be suitable to have here
             isActiveBool = transport.startProxying()
             if isActiveBool:
-                logger.info("Data proxying correctly")
+                self.logger.info("Data proxying correctly")
         else:
-            logger.info("No transports launched.")
+            self.logger.info("No transports launched.")

@@ -3,37 +3,39 @@ import sys
 import argparse
 import pyptlib_python3.pyptlib.config
 import managed.client
+import managed.server
 import logging
 
-def do_managed_mode(addr, socksVersion, socksPort):
-    managedclient = managed.client.managedClient
-    managedclient.managed_client(addr, socksVersion, socksPort)
-
+def do_managed_mode(sctpaddr, socksVersion, socksPort, serverinterface, serverbool):
+    #for testing, commented out below is for use with tor
+    if serverbool == True:
+        managedclient = managed.server.managedServer()
+        managedclient.managed_server(sctpaddr, serverinterface)
+    else:
+        managedclient = managed.client.managedClient()
+        managedclient.managed_client(sctpaddr, socksVersion, socksPort)
     #commenting so it can be used without tor
     # if pyptlib_python3.pyptlib.config.checkClientMode():
     #     log.info('Entering client managed mode')
-    #     #below line nonorig, start everything in managed mode
-    #     #calls on client.py, a file with only this function defined
-    #     managed.client.managed_client(addr, socksVersion, socksPort)
+    #     managed.client.managed_client(sctpaddr, socksVersion, socksPort)
     # else:
     #     log.info('Entering server managed mode')
-    #     #below line nonorig, start managed mode for server
-    #     #calls upon server.py, same directory as client.py, file with only this function defined
-    #     managed_server.do_managed_server()
+    #     managed.server.managed_server(sctpaddr, serverinterface)
 
-#gather command line arguments
-#all paramaters have defaults, theoretically tor would never pass a parameter
 bindinterface = ''
 bindport = ''
 managedorexternalmode = ''
 socksversion = ''
 socksport = ''
+servint = ''
 verbose = True
 parser = argparse.ArgumentParser(description='SCTP Based Pluggable Transport\nnote: ensure firewall rules and network configuration are suitable for SCTP')
 parser.add_argument('--bind-interface', dest='bindinterface', action='store_const', const=bindinterface, default="0.0.0.0",
-                    help='Interface for outward facing SCTP Socket to bind to, (default: `0.0.0.0`)')
-parser.add_argument('--bind-port', dest='bindport', action='store_const', const=bindport, default=443,
-                    help='Port for outward facing SCTP Socket to bind to, (default: 443)')
+                    help='Interface for SCTP Socket to bind to, (default: `0.0.0.0`)')
+parser.add_argument('--bind-port', dest='bindport', action='store_const', const=bindport, default=6000,
+                    help='Port for SCTP Socket to bind to, (default: 6000)')
+parser.add_argument('--server-interface', dest='servint', action='store_const', const=servint, default="0.0.0.0",
+                    help='Interface facing tor network, (default: 0.0.0.0)')
 parser.add_argument('--managed-or-external', dest='managedorexternalmode', action='store_const', const=managedorexternalmode, default="managed",
                     help='Managed or external mode, in 99%% of use cases managed is ideal (default: `managed`)')
 parser.add_argument('--socks-version', dest='socksversion', action='store_const', const=socksversion, default=5,
@@ -42,14 +44,18 @@ parser.add_argument('--socks-port', dest='socksport', action='store_const', cons
                     help='Port for socks to listen on, dependent on Tor configuration (default: 9050)')
 parser.add_argument('--verbose', dest='verbose', action='store_true', default=True,
                     help='Toggle logging verbosity, (default: true, change after development)')
+parser.add_argument('--server', dest='server', action='store_true', default=False,
+                    help='Toggle server mode, (default: false)')
 args = parser.parse_args()
 
 parser.print_help()
 
-addr = ((args.bindinterface, args.bindport))
+sctpaddr = ((args.bindinterface, args.bindport))
 socksVersion = args.socksversion
 socksPort = args.socksport
 isverbose = args.verbose
+serverinterface = args.servint
+serverbool = args.server
 #configure logger
 if isverbose:
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
@@ -63,6 +69,6 @@ logger = logging.getLogger(__name__)
 
 
 if args.managedorexternalmode == "managed":
-    do_managed_mode(addr, socksVersion, socksPort)
+    do_managed_mode(sctpaddr, socksVersion, socksPort, serverinterface, serverbool)
 else:
     print("external mode not supported at this time")

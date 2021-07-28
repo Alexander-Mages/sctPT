@@ -1,6 +1,7 @@
 import logging
 from transport.ServerDataTransform import DataTransform
-class clientTransport:
+
+class serverTransport:
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
@@ -8,7 +9,7 @@ class clientTransport:
 
 
 #source is sctp traffic from tor, destination is tor network tcp
-    def reverseProxy(self, source, dest):
+    def toTorNet(self, source, dest):
         while True:
             #numbers larger than 4096 work
             data = source.recv(4096)
@@ -16,4 +17,14 @@ class clientTransport:
                 break
             finaldata = self.datatransform.unobfuscateData(data)
             dest.sendall(finaldata)
-            self.logger.debug("data sent to tor node")
+            self.logger.debug("data recieved from client, forwarded sent to tor node")
+
+#source is tor network tcp, destination is tor client over sctp
+    def reverseProxy(self, source, dest):
+        while True:
+            data = source.recv(4096)
+            if data == '':
+                break
+            finaldata = self.datatransform.obfuscateData(data)
+            dest.sendall(finaldata)
+            self.logger.debug("data recieved from tor node, forwarded over sctp to client")
