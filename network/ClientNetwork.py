@@ -31,15 +31,13 @@ class ClientNetwork:
 
 
         self.logger.debug("attempting to connect to Tor bridge and Tor Browser")
-        sockssocket, address = sockssock.accept()
+        self.sockssocket, address = sockssock.accept()
         self.logger.debug("socks connection accepted from tor browser at" + str(address))
         #debugging
-        sctpaddrport = ("192.168.1.25", 6000)
+        sctpaddrport = ("192.168.1.12", 6000)
         #debugging
-        self.sctpsocket.settimeout(10)
-        err = self.sctpsocket.connect_ex(("192.168.1.25", 6000))
-        print(err)
-        self.logger.debug("sctp connected to bridge")
+        err = self.sctpsocket.connect_ex(sctpaddrport)
+        self.logger.debug("sctp connected to bridge at" + str(sctpaddrport))
 
         # self.sctpsocket = sctpsocket
         # self.sockssocket = sctpsocket
