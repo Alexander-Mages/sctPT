@@ -11,7 +11,6 @@ class ServerNetwork:
 
     def launchTransport(self, sctpaddrport, tcpaddrport):
         self.logger.debug("launching sctp socket to communicate with client")
-#sctp to tcp, tcp to sctp
         sctpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_SCTP)
         sctpsock.bind(sctpaddrport)
         sctpsock.listen(25)
@@ -33,7 +32,7 @@ class ServerNetwork:
         return address1, address2
 
     def startProxying(self):
-
+        #final method, does not terminate until program is completed
         self.logger.debug("starting processes for sockets")
 
         self.runningProcesses = []
@@ -48,6 +47,7 @@ class ServerNetwork:
 
         self.runningProcesses.append(upstreamTransport)
         self.runningProcesses.append(downstreamTransport)
+
         return self.isRunning()
 
     def isRunning(self):

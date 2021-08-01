@@ -7,14 +7,15 @@ import managed.server
 import logging
 
 def do_managed_mode(sctpaddr, socksVersion, socksPort, serverinterface, serverbool):
-    #for testing, commented out below is for use with tor
+    #This code uses command line args to choose client or server. default is client
     if serverbool == True:
         managedclient = managed.server.managedServer()
         managedclient.managed_server(sctpaddr, serverinterface)
     else:
         managedclient = managed.client.managedClient()
         managedclient.managed_client(sctpaddr, socksVersion, socksPort)
-    #commenting so it can be used without tor
+
+    #This code uses pyptlib to look for Tor set environmental variables
     # if pyptlib_python3.pyptlib.config.checkClientMode():
     #     log.info('Entering client managed mode')
     #     managed.client.managed_client(sctpaddr, socksVersion, socksPort)

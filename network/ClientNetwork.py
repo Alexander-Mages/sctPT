@@ -33,19 +33,9 @@ class ClientNetwork:
         self.logger.debug("attempting to connect to Tor bridge and Tor Browser")
         self.sockssocket, address = sockssock.accept()
         self.logger.debug("socks connection accepted from tor browser at" + str(address))
-        #debugging
-        sctpaddrport = ("192.168.1.12", 6000)
-        #debugging
         err = self.sctpsocket.connect_ex(sctpaddrport)
         self.logger.debug("sctp connected to bridge at" + str(sctpaddrport))
 
-        # self.sctpsocket = sctpsocket
-        # self.sockssocket = sctpsocket
-
-        # CHANGE NAME OF SOCKSSOCKET, IT IS WAY TOO SIMIMLAR TO SOCKSOCKET
-        # no idea whether to use multiprocessing, threading, concurrency, or asyncrynosity
-
-        # whichever one of these runs first, is the one that starts
 
     def startProxying(self):
         #final method, does not terminate until program is completed
@@ -60,9 +50,6 @@ class ClientNetwork:
 
         downstreamTransport.start()
         upstreamTransport.start()
-        
-        # downstreamTransport.join()
-        # upstreamTransport.join()
 
         self.runningProcesses.append(downstreamTransport)
         self.runningProcesses.append(upstreamTransport)

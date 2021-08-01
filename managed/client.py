@@ -8,8 +8,6 @@ import network.ClientNetwork
 
 
 class managedClient:
-    #add logger support, take obfsproxy example
-
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
@@ -20,6 +18,8 @@ class managedClient:
         sctpaddrport = (addr)
         socksaddrport = (("localhost", socksPort))
         socksversion = socksVersion
+
+    #the below code relies on pyptlib, to enable it, delete lines 60 and 61 and uncomment
     #
     #GET TRANSPORT INFO FROM TOR
     #
@@ -65,6 +65,8 @@ class managedClient:
         should_start_threading = True
         self.logger.debug("Successfully launched sctPT. Socks listening at: " + (str(socksaddrport)))
         self.logger.debug("SCTP listening at: " + str((socksaddrport)))
+
+        #enable this when using with tor
         # pyptlib_python3.pyptlib.client.reportSuccess('sctPT', socksversion, (socksaddrport), None, None)
         # pyptlib_python3.pyptlib.client.ReportEnd()
         #tells pyptlib everything is finished, wihch then tells tor to start pushing traffic

@@ -11,13 +11,14 @@ class serverTransport:
 #source is sctp traffic from tor, destination is tor network tcp
     def toTorNet(self, source, dest):
         while True:
-            #numbers larger than 4096 work
+            #4096 is arbitrary
             data = source.recv(4096)
             if data == '':
                 break
             finaldata = self.datatransform.unobfuscateData(data)
             dest.sendall(finaldata)
             self.logger.debug("data recieved from client, forwarded sent to tor node")
+
 
 #source is tor network tcp, destination is tor client over sctp
     def reverseProxy(self, source, dest):

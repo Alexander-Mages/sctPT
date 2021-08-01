@@ -16,8 +16,11 @@ class managedServer:
         should_start_threading = False
 
         sctpaddrport = sctpaddr
+        #uncomment for use with pyptlib
         #tcpaddrport = (serverinterface, managed_info['orport'])
         tcpaddrport = (serverinterface, 6000)
+
+    #to enable use with Tor, delete line 44 and 45, and uncomment
     #
     #GET TRANSPORT INFO FROM TOR
     #
@@ -38,7 +41,6 @@ class managedServer:
     #             error_msg = "Couldnt start socket."
     #             logger.warning(error_msg)
     #             pyptlib_python3.pyptlib.server.reportFailure('sctPT', error_msg)
-
         transport = network.ServerNetwork.ServerNetwork()
         addr1, addr2 = transport.launchTransport(sctpaddrport, tcpaddrport)
 
@@ -49,12 +51,13 @@ class managedServer:
         should_start_threading = True
         self.logger.debug("Successfully launched sctPT server")
         self.logger.debug("Sctp connected at "+(str(addr1)) + "\nTcp connected at " + (str(addr2)))
+
+        #enable the below when in use with tor
         # pyptlib_python3.pyptlib.client.reportSuccess('sctPT', socksversion, (socksaddrport), None, None)
         # pyptlib_python3.pyptlib.client.ReportEnd()
         #tells pyptlib everything is finished, wihch then tells tor to start pushing traffic
 
         if should_start_threading:
-            #args might be suitable to have here
             isActiveBool = transport.startProxying()
             if isActiveBool:
                 self.logger.info("Data proxying correctly")
