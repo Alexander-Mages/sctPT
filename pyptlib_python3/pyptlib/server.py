@@ -6,8 +6,8 @@ Public server-side pyptlib API.
 """
 
 from __future__ import absolute_import
-from pyptlib.core import TransportPlugin
-from pyptlib.server_config import ServerConfig
+from pyptlib_python3.pyptlib.core import TransportPlugin
+from pyptlib_python3.pyptlib.server_config import ServerConfig
 import six
 
 

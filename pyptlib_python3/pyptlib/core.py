@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 import sys
 
-from pyptlib.config import EnvError, SUPPORTED_TRANSPORT_VERSIONS
+from pyptlib_python3.pyptlib.config import EnvError, SUPPORTED_TRANSPORT_VERSIONS
 
 
 class TransportPlugin(object):

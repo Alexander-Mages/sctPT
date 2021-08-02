@@ -7,9 +7,9 @@ Low-level parts of pyptlib that are only useful to servers.
 
 from __future__ import absolute_import
 import pyptlib.config as config
-import pyptlib.util as util
+import pyptlib_python3.pyptlib.util as util
 
-from pyptlib.config import env_has_k, get_env, SUPPORTED_TRANSPORT_VERSIONS
+from pyptlib_python3.pyptlib.config import env_has_k, get_env, SUPPORTED_TRANSPORT_VERSIONS
 
 def get_transport_options_impl(string):
     """

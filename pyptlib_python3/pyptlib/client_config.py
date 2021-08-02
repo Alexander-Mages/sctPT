@@ -6,7 +6,7 @@ Low-level parts of pyptlib that are only useful to clients.
 """
 
 from __future__ import absolute_import
-from pyptlib.config import Config, get_env
+from pyptlib_python3.pyptlib.config import Config, get_env
 
 class ClientConfig(Config):
     """
