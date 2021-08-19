@@ -1,8 +1,6 @@
-PAGE
+### sctPT -  An SCTP-Based Pluggable Transport in Python[^1]
 
-sctPT -  An SCTP-Based Pluggable Transport in Python[^1]
-
-Alexander Mages[^2]
+# Alexander Mages[^2]
 
 ## Overview of Functionality
 At the highest level, this client takes TCP traffic via SOCKS, proxies it over SCTP[^3] to the server, which subsequently proxies it outward in original TCP. The reverse is also true, when the server receives TCP traffic, it is proxied upstream to the client via SCTP, which is further proxied across loopback to the client application via SOCKS. The program has a couple use cases. I will explain each one in non-exhaustive detail below.
