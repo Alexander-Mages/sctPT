@@ -85,11 +85,19 @@ At the highest level, this client takes TCP traffic via SOCKS, proxies it over S
 
 
 [^1]: <https://github.com/Alexander-Mages/sctPT>
+
 [^2]: Advised by Eugene Vasserman
+
 [^3]: <https://en.wikipedia.org/wiki/Stream_Control_Transmission_Protocol>
+
 [^4]: <https://github.com/Alexander-Mages/pyptlib_python3>
+
 [^5]: <https://pyptlib.readthedocs.io/en/master/>
+
 [^6]: <https://docs.python.org/3/library/multiprocessing.html>
+
 [^7]: <https://pypi.org/project/PySocks/>
+
 [^8]: <https://python-modernize.readthedocs.io/en/latest/>
+
 [^9]: <https://github.com/Yawning/obfsproxy>
