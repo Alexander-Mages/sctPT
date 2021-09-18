@@ -1,6 +1,6 @@
 # sctPT -  An SCTP-Based Pluggable Transport in Python[^1]
 
-### Alexander Mages[^2]
+### Alexander Mages^2
 
 ## Overview of Functionality
 At the highest level, this client takes TCP traffic via SOCKS, proxies it over SCTP[^3] to the server, which subsequently proxies it outward in original TCP. The reverse is also true, when the server receives TCP traffic, it is proxied upstream to the client via SCTP, which is further proxied across loopback to the client application via SOCKS. The program has a couple use cases. I will explain each one in non-exhaustive detail below.
@@ -73,8 +73,8 @@ At the highest level, this client takes TCP traffic via SOCKS, proxies it over S
 1. export PYTHONPATH=$PYTHONPATH:~/sctPT/
    1. Importing custom library has been unstable for me, this generally solves the issue
 1. Run “python3 sctPT.py --server” on the server
-1. Run “telnet 127.0.0.1 9000” on the server
-1. Run “python3 sctPT.py” on the client
+1. Run “telnet 127.0.0.1 6000” on the server
+1. Run “python3 sctPT.py --bind-interface 127.0.0.1” on the client
 1. On the client, run “telnet 127.0.0.1 9050”
 1. After all of this, the endpoints should be connected, and data can be sent back and forth
 ## Additional Notes
