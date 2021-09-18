@@ -47,7 +47,7 @@ At the highest level, this client takes TCP traffic via SOCKS, proxies it over S
   - All testing has been done using telnet and ncat’s SCTP functionality
     - ncat --sctp 1.1.1.1 6000
     - telnet 1.1.1.1 9050
-- There is no data obfuscation (other than base64 encoding) and the data is very much cleartext
+- There is no data obfuscation (tried with base64 and works, but not implemented) and the data is very much cleartext
 - No native Windows support for SCTP
   - There are libraries that could solve this problem but I have not used them nor know if they are reliable or functional
   - I have written a partial SCTP stack in Scapy (client only). It is very much a prototype, but it is functional. Scapy is supported in Windows and as far as I know does not require native support due to the low level nature of the interface.

@@ -31,17 +31,17 @@ socksport = ''
 servint = ''
 verbose = True
 parser = argparse.ArgumentParser(description='SCTP Based Pluggable Transport\nnote: ensure firewall rules and network configuration are suitable for SCTP')
-parser.add_argument('--bind-interface', dest='bindinterface', action='store_const', const=bindinterface, default="0.0.0.0",
+parser.add_argument('--bind-interface', dest='bindinterface', action='store', const=bindinterface, default="0.0.0.0",
                     help='Interface for SCTP Socket to bind to, (default: `0.0.0.0`)')
-parser.add_argument('--bind-port', dest='bindport', action='store_const', const=bindport, default=6000,
+parser.add_argument('--bind-port', dest='bindport', action='store', const=bindport, default=6000,
                     help='Port for SCTP Socket to bind to, (default: 6000)')
-parser.add_argument('--server-interface', dest='servint', action='store_const', const=servint, default="0.0.0.0",
+parser.add_argument('--server-interface', dest='servint', action='store', const=servint, default="0.0.0.0",
                     help='Interface facing tor network, (default: 0.0.0.0)')
-parser.add_argument('--managed-or-external', dest='managedorexternalmode', action='store_const', const=managedorexternalmode, default="managed",
+parser.add_argument('--managed-or-external', dest='managedorexternalmode', action='store', const=managedorexternalmode, default="managed",
                     help='Managed or external mode, in 99%% of use cases managed is ideal (default: `managed`)')
-parser.add_argument('--socks-version', dest='socksversion', action='store_const', const=socksversion, default=5,
+parser.add_argument('--socks-version', dest='socksversion', action='store', const=socksversion, default=5,
                     help='Socks version to be used, Socks5 is idea excepting certain cases (default: 5)')
-parser.add_argument('--socks-port', dest='socksport', action='store_const', const=socksport, default=9050,
+parser.add_argument('--socks-port', dest='socksport', action='store', const=socksport, default=9050,
                     help='Port for socks to listen on, dependent on Tor configuration (default: 9050)')
 parser.add_argument('--verbose', dest='verbose', action='store_true', default=True,
                     help='Toggle logging verbosity, (default: true, change after development)')
